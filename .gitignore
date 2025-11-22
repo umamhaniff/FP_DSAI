@@ -1,0 +1,47 @@
+# ------------------------------------
+# 1. ENVIRONMENT VIRTUAL & CACHE
+# ------------------------------------
+.venv
+venv
+*/__pycache__
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+.DS_Store # Untuk pengguna MacOS
+
+# ------------------------------------
+# 2. FILE DATA (Sensitif atau Besar)
+# ------------------------------------
+# File data CSV/Parquet yang diunduh atau dihasilkan.
+# Ini penting karena Anda tidak ingin mengunggah file data besar.
+# data/*.csv
+data/*.parquet
+data/*.xlsx
+
+# ------------------------------------
+# 3. KONFIGURASI LOKAL & KUNCI API
+# ------------------------------------
+# JANGAN PERNAH mengunggah kunci API atau rahasia ke Git.
+.env
+config.py
+*secrets.json
+.streamlit/
+streamlit.txt
+
+# ------------------------------------
+# 4. OUTPUT HASIL MODELLING
+# ------------------------------------
+# Model yang sudah dilatih (terkadang besar)
+*.h5
+*.pkl
+*.model
+*.joblib
+
+# ------------------------------------
+# 5. STREAMLIT & ARTIFACTS
+# ------------------------------------
+# Folder cache Streamlit
+.streamlit/cache/
+
+# Log
+*.log
