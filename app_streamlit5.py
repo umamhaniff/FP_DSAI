@@ -462,7 +462,7 @@ def page_home(df, cf_recommender):  # --- INTEGRASI: Tambahkan cf_recommender --
     if cf_recommender:
         most_liked_products = cf_recommender.get_most_liked_products(top_n=5)
         if not most_liked_products.empty:
-            display_grid(most_liked_products, "🔥Produk Terlaris", full_df=df, prefix="terlaris")  # --- PERBAIKAN: Tambahkan prefix ---
+            display_grid(most_liked_products, "🔥 Produk Terlaris", full_df=df, prefix="terlaris")  # --- PERBAIKAN: Tambahkan prefix ---
         else:
             st.warning("Tidak ada produk terlaris tersedia.")
     
@@ -598,5 +598,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
     
