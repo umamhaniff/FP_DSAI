@@ -52,10 +52,27 @@ Perintah Alternatif: Gunakan perintah ini jika perintah utama mengalami kendala 
     python -m streamlit run app_streamlit.py
 ```
 
-----
+---
+
 > [!TIP] Catatan Tambahan  
 > Pastikan Anda menjalankan terminal di dalam folder proyek yang memuat file _app_streamlit.py_ dan _requirements.txt_.  
 > Jika ingin menghentikan aplikasi, tekan Ctrl + C pada terminal.
+
+---
+
+### 📋 Git Cheat Sheet (Lengkap)
+
+| Command             | Fungsi                                                   | Contoh Penggunaan                                      |
+| :------------------ | :------------------------------------------------------- | :----------------------------------------------------- |
+| **Combo Upload** ⚡ | 🚀 **Cara Cepat** (3-in-1) Add + Commit + Push sekaligus | `git add . && git commit -m "update code" && git push` |
+| `git status`        | 🔍 Cek file yang berubah                                 | `git status`                                           |
+| `git add`           | 📦 Masukkan file ke Staging                              | `git add .` (semua)<br>`git add file.py` (satu)        |
+| `git commit`        | 💾 Simpan perubahan                                      | `git commit -m "pesan"`                                |
+| `git push`          | ☁️ Upload ke GitHub                                      | `git push origin main`                                 |
+| `git pull`          | ⬇️ Ambil update dari GitHub                              | `git pull`                                             |
+| `git log`           | 📜 Lihat riwayat                                         | `git log --oneline`                                    |
+
+---
 
 # Versi:
 
