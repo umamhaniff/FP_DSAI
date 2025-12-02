@@ -471,58 +471,91 @@ def page_home(df, cf_recommender):
         st.rerun()
 
     # --- Categories ---
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("🛍️ Shop by Categories")
-    
+    st.markdown("### Shop with Categories")
+
     categories = [
         {"name": "Skincare", "image": "https://i.pinimg.com/736x/4c/16/7c/4c167c5ac422efd13eba8e07d04274a7.jpg"},
         {"name": "Bodycare", "image": "https://i.pinimg.com/736x/bf/00/df/bf00df3d3cf4271cdb625a387936f90d.jpg"},
         {"name": "Haircare", "image": "https://i.pinimg.com/736x/02/d5/7f/02d57f094a70a0b5c6c1f7279b21a2d3.jpg"},
         {"name": "Make Up", "image": "https://i.pinimg.com/1200x/e4/14/34/e414342a7464892f646fe9baeee41c51.jpg"},
         {"name": "Others", "image": "https://i.pinimg.com/736x/2d/f3/c2/2df3c287f50c35de6d65d16ff225ebda.jpg"}
-    ]
+]
 
     cols = st.columns(5)
+
     for i, (col, category) in enumerate(zip(cols, categories)):
         with col:
+        # Container untuk seluruh card
             with st.container():
-                if st.button("⠀", key=f"cat_btn_{i}", use_container_width=True):
-                    # Placeholder: Logic kategori bisa ditambahkan di sini
-                    st.toast(f"Kategori {category['name']} dipilih! (Fitur Coming Soon)", icon="🚧")
-                
-                st.markdown(f"""
-                <div class="category-card-img">
-                    <img src="{category['image']}" style="width: 100%; height: 100px; object-fit: cover;">
-                    <div class="category-label">{category['name']}</div>
-                </div>
-                """, unsafe_allow_html=True)
+            # Button yang benar-benar menutupi card
+                    if st.button(
+                    "⠀",  # Unicode empty character
+                    key=f"cat_btn_{i}",
+                    use_container_width=True
+                    ):
+                        st.session_state.selected_category = category["name"]
+                        st.session_state.search_triggered = True
+                        st.rerun()                          
+            
+            # Gambar dan text - diposisikan di belakang button
+            st.markdown(f"""
+            <div class="category-card-img">
+                <img src="{category['image']}" alt="{category['name']}" 
+                     style="width: 100%; height: 100px; object-fit: cover;">
+                <div class="category-label">{category['name']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <style>
-    .category-card-img {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin-bottom: 10px;
-        position: relative;
-    }
-    .category-label {
-        background: #385F8C;
-        color: white;
-        padding: 5px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    /* Overlay Button agar gambar bisa diklik */
-    div[data-testid="column"] button {
-        position: absolute !important;
-        z-index: 2 !important;
-        opacity: 0 !important;
-        height: 120px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+            st.markdown("""
+            <style>
+            .category-card-img {
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                margin-bottom: 10px;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .category-card-img:hover {
+                box-shadow: 0 1px 10px rgba(255, 255, 255, 0.8);  /* Ini yang putih */
+                transform: translateY(-3px);
+            }
+
+            .category-label {
+                background: #385F8C;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            /* Button yang menutupi seluruh card */
+            .stButton > button {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: transparent !important;
+                border: none !important;
+                color: transparent !important;
+                z-index: 100 !important;
+                cursor: pointer !important;
+            }
+
+            .stButton > button:hover {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            /* Container relatif untuk positioning */
+            div[data-testid="column"] > div:first-child {
+                position: relative !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
     st.markdown("---")
 
