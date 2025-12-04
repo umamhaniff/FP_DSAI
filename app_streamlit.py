@@ -448,7 +448,7 @@ def page_home(df, cf_recommender):
                 <div style='
                     font-size: 30px; 
                     font-weight: 900; 
-                    color: #FFFFFF; 
+                    color: #385F8C; 
                     margin-top: -5px;
                     white-space: nowrap;
                     cursor: pointer;
