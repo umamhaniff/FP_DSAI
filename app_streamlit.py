@@ -494,7 +494,14 @@ def page_home(df, cf_recommender):
 
         with c_logo:
             st.markdown("""
-                <div style='font-size: 30px; font-weight: 900; color: #385F8C; margin-top: -5px; white-space: nowrap; cursor: pointer;'>
+                <div style='
+                    font-size: 30px; 
+                    font-weight: 900; 
+                    color: #FFFFFF; 
+                    margin-top: -5px;
+                    white-space: nowrap;
+                    cursor: pointer;
+                '>
                     clickmart
                 </div>
             """, unsafe_allow_html=True)
