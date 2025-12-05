@@ -76,8 +76,8 @@ Perintah Alternatif: Gunakan perintah ini jika perintah utama mengalami kendala 
 
 # Versi:
 
-- streamlit run app_streamlit.py = Hybrid+CF 
-- streamlit run app_streamlit2.py = maybe can be Final File
+- streamlit run app_streamlit.py = maybe can be Final File
+- streamlit run app_streamlit2.py = Hybrid+CF 
 - streamlit run app_streamlit3.py = UI/UX Ekspresif
 - streamlit run app_streamlit4.py = Afrida & Hanifa
 - streamlit run app_streamlit5.py = Kak Agnes & Lisa
