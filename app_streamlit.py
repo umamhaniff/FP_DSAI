@@ -42,7 +42,7 @@ def filter_by_category(df, category_name):
 
     if cat_lower in keywords:
         mask = df['Category'].str.contains(keywords[cat_lower], case=False, regex=True, na=False) | \
-               df['Name'].str.contains(keywords[cat_lower], case=False, regex=True, na=False)
+            df['Name'].str.contains(keywords[cat_lower], case=False, regex=True, na=False)
         df_filtered = df[mask]
     elif cat_lower == "others":
         all_keywords = "|".join(keywords.values())

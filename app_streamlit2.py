@@ -44,6 +44,16 @@ def inject_custom_css():
             background-color: #f8f9fa;
         }
 
+        .block-container {
+            padding-top: 3rem !important; /* Default Streamlit ~6rem, kita ubah jadi 1rem */
+            padding-bottom: 2rem !important;
+        }
+        
+        /* Hilangkan margin bawaan dari elemen pertama */
+        .block-container > div:first-child {
+            margin-top: 0 !important;
+        }
+
         /* HEADINGS */
         h1, h2, h3, h4, h5, h6 {
             color: #1E293B !important;
@@ -129,8 +139,9 @@ def inject_custom_css():
     """, unsafe_allow_html=True)
 
 # --- Fungsi Bantu Kategorisasi (Logic Code 1) ---
+# --- Fungsi Bantu Kategorisasi (Regex Optimized) ---
 def filter_by_category(df, category_name):
-    """Filter dataframe menggunakan regex boundary (Code 1 Logic)."""
+    """Filter dataframe menggunakan regex boundary untuk akurasi lebih tinggi."""
     df_filtered = pd.DataFrame()
     cat_lower = category_name.lower()
     
@@ -143,7 +154,7 @@ def filter_by_category(df, category_name):
 
     if cat_lower in keywords:
         mask = df['Category'].str.contains(keywords[cat_lower], case=False, regex=True, na=False) | \
-               df['Name'].str.contains(keywords[cat_lower], case=False, regex=True, na=False)
+            df['Name'].str.contains(keywords[cat_lower], case=False, regex=True, na=False)
         df_filtered = df[mask]
     elif cat_lower == "others":
         all_keywords = "|".join(keywords.values())
@@ -177,7 +188,7 @@ def display_evaluation_ui(evaluation: HybridEvaluation):
     elif score >= 5: color, bg_color, icon = "#f97316", "#ffedd5", "⚖️ Moderate"
     else: color, bg_color, icon = "#ef4444", "#fee2e2", "⚠️ Low Relevance"
 
-    st.markdown("---")
+    st.markdown("")
     with st.container(border=True):
         c1, c2 = st.columns([1, 4])
         with c1:
@@ -265,11 +276,18 @@ def render_product_card(row, full_df=None, prefix=""):
                 </div>
             """, unsafe_allow_html=True)
 
+        full_brand = row.get('Brand', '-')
+        # Jika panjang lebih dari 20 karakter, potong dan tambah '...'
+        if len(full_brand) > 20:
+            display_brand = full_brand[:20] + "..."
+        else:
+            display_brand = full_brand
+        
         st.markdown(f"<div class='product-title' title='{row.get('Name', 'No Name')}'>{row.get('Name', 'No Name')}</div>", unsafe_allow_html=True)
         
         c_brand, c_rate = st.columns([2, 1])
         with c_brand:
-            st.caption(row.get('Brand', '-'))
+            st.caption(display_brand)
         with c_rate:
             rating_int = int(row.get('Rating', row.get('average_rating', 0)))
             st.markdown(f"⭐ **{rating_int}**")
@@ -308,9 +326,9 @@ def render_header(show_search_controls=False, custom_title=None):
         st.markdown('<span id="header-marker"></span>', unsafe_allow_html=True) 
         
         if show_search_controls:
-            c_back, c_logo, c_mid, c_num, c_sbtn, c_ebtn = st.columns([0.6, 1.5, 3.5, 1, 0.6, 1.8], gap="small")
+            c_back, c_logo, c_mid, c_num, c_sbtn, c_ebtn = st.columns([0.6, 1, 3.5, 1, 0.6, 1.8], gap="small")
         else:
-            c_back, c_logo, c_mid, c_sbtn = st.columns([0.6, 1.5, 6, 0.6], gap="small")
+            c_back, c_logo, c_mid, c_sbtn = st.columns([0.6, 1, 6, 0.6], gap="small")
 
         # 1. Back Button
         with c_back:
@@ -399,24 +417,42 @@ def initialize_system():
 # 3. HALAMAN (PAGES)
 # ==========================================
 
-# --- Halaman: Category View (Logic Code 1) ---
+# --- Halaman: Category View (Updated with Function) ---
 def page_category_view(df):
     category_name = st.session_state.get("selected_category", "Others")
     
-    # Header Code 1 (updated style)
-    render_header(show_search_controls=False, custom_title=f"Kategori: {category_name}")
+    # [1] PANGGIL HEADER (Custom Title)
+    render_header(show_search_controls=False, custom_title=
+    f"""
+        <div style="
+            border: 1px solid #e2e8f0; 
+            background-color: #f8f9fa; 
+            border-radius: 8px; 
+            padding: 8px 12px; 
+            color: #334155; 
+            font-size: 1rem; 
+            display: flex; 
+            align-items: center; 
+            height: 42px; /* Tinggi standar tombol Streamlit */
+            margin-top: 0px;
+        ">
+            <span style="color: #64748b; margin-right: 5px;">Kategori:</span> 
+            <span style="font-weight: 600; color: #1e293b;">{category_name}</span>
+        </div>
+    """)
 
-    # Logic Filter Code 1
+    # --- FILTERING ---
     filtered_df = filter_by_category(df, category_name)
+
     st.markdown(f"Found **{len(filtered_df)}** products in {category_name}")
     st.markdown("---")
 
     if filtered_df.empty:
         st.info(f"😔 Maaf, produk untuk kategori '{category_name}' belum tersedia.")
-        render_footer()
+        render_footer() # Tetap tampilkan footer
         return
 
-    # Logic Pagination Code 1
+    # --- PAGINASI ---
     ITEMS_PER_PAGE = 10
     if "cat_page_number" not in st.session_state:
         st.session_state.cat_page_number = 0
@@ -430,10 +466,10 @@ def page_category_view(df):
     end_idx = start_idx + ITEMS_PER_PAGE
     batch_df = filtered_df.iloc[start_idx:end_idx]
 
-    # Render Grid (UI Code 2)
+    # --- RENDER GRID ---
     display_grid(batch_df, "", full_df=df, prefix=f"cat_{category_name}")
 
-    # Navigasi Code 1
+    # --- NAVIGASI HALAMAN ---
     st.markdown("<br>", unsafe_allow_html=True)
     c_prev, c_info, c_next = st.columns([1, 2, 1])
     
@@ -450,11 +486,11 @@ def page_category_view(df):
             st.session_state.cat_page_number += 1
             st.rerun()
 
+    # [2] PANGGIL FOOTER
     render_footer()
 
 # --- Halaman: Product Recommender (Logic Code 1) ---
 def page_recommender(df, recommender, llm_tools, metrics, cf_recommender):
-    st.title("🛍️ Pencarian & Rekomendasi")
     
     # Header Code 1 (updated style)
     product_query, top_n, run_search, run_eval = render_header(show_search_controls=True)
@@ -547,8 +583,7 @@ def page_recommender(df, recommender, llm_tools, metrics, cf_recommender):
 # --- Halaman: Home Page (STRUKTUR HEADER & FOOTER DARI CODE 1) ---
 
 def page_home(df, cf_recommender):
-    # Header Home Code 1 (Layout)
-    # Tidak menggunakan ID 'header-marker' agar tidak kena gradient style, tapi tetap rapi karena CSS global
+    # 1. Header Home
     with st.container(border=True):
         c_logo, c_search, c_btn = st.columns([1.2, 4.3, 0.5], gap="small")
 
@@ -576,8 +611,88 @@ def page_home(df, cf_recommender):
         st.session_state["current_page"] = "recommender"
         st.rerun()
 
-    # Categories (Code 1 Layout + Code 2 Styling via CSS)
-    st.markdown("### Shop with Categories")
+    # ==========================================
+    # [BARU] CSS CAROUSEL (SLIDESHOW) SECTION
+    # ==========================================
+    st.markdown("<br>", unsafe_allow_html=True) 
+
+    # Link Gambar Banner
+    img1 = "https://i.pinimg.com/1200x/94/76/7e/94767ef965cba55540a8ebc875aae1cc.jpg"
+    img2 = "https://i.pinimg.com/1200x/e8/c1/b6/e8c1b61a863d1be4a2a1b03bcbd2aee3.jpg"
+    img3 = "https://i.pinimg.com/736x/dc/a6/36/dca6368b8a4563b0d1de85ec1efc677d.jpg"
+
+    # HTML & CSS untuk Carousel Otomatis
+    carousel_html = f"""
+    <style>
+        /* Container Utama Slider */
+        .slider-frame {{ 
+            overflow: hidden; 
+            width: 100%; 
+            height: 300px;  /* <--- TINGGI FIX (Sesuaikan jika ingin lebih pendek/tinggi) */
+            border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }}
+
+        /* Container Geser (Width 300% untuk 3 gambar) */
+        .slide-images {{
+            width: 300%;
+            display: flex;
+            animation: slide_animation 12s infinite; /* Durasi total animasi */
+        }}
+
+        /* Setiap Gambar (Width 1/3 dari container geser) */
+        .img-container {{
+            width: 33.333%;
+            position: relative;
+        }}
+
+        .img-container img {{
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            /* Opsional: Membatasi tinggi maksimum agar tidak terlalu panjang */
+            max-height: 400px; 
+            min-height: 200px;
+        }}
+
+        /* Keyframes untuk Animasi Geser */
+        @keyframes slide_animation {{
+            0% {{ margin-left: 0; }}
+            30% {{ margin-left: 0; }}       /* Tahan gambar 1 */
+            
+            33% {{ margin-left: -100%; }}   /* Geser ke gambar 2 */
+            63% {{ margin-left: -100%; }}   /* Tahan gambar 2 */
+            
+            66% {{ margin-left: -200%; }}   /* Geser ke gambar 3 */
+            96% {{ margin-left: -200%; }}   /* Tahan gambar 3 */
+            
+            100% {{ margin-left: 0; }}      /* Kembali ke awal */
+        }}
+    </style>
+
+    <div class="slider-frame">
+        <div class="slide-images">
+            <div class="img-container">
+                <img src="{img1}" alt="Banner 1">
+            </div>
+            <div class="img-container">
+                <img src="{img2}" alt="Banner 2">
+            </div>
+            <div class="img-container">
+                <img src="{img3}" alt="Banner 3">
+            </div>
+        </div>
+    </div>
+    """
+    
+    # Render Carousel
+    st.markdown(carousel_html, unsafe_allow_html=True)
+    # ==========================================
+
+    # 2. Categories (Code 1 Layout + Code 2 Styling via CSS)
+    st.markdown("### 🛍️ Kategori Pilihan")
     categories = [
         {"name": "Skincare", "image": "https://i.pinimg.com/736x/4c/16/7c/4c167c5ac422efd13eba8e07d04274a7.jpg"},
         {"name": "Bodycare", "image": "https://i.pinimg.com/736x/bf/00/df/bf00df3d3cf4271cdb625a387936f90d.jpg"},
@@ -590,7 +705,7 @@ def page_home(df, cf_recommender):
     for i, (col, category) in enumerate(zip(cols, categories)):
         with col:
             with st.container():
-                if st.button("⠀", key=f"cat_btn_{i}", use_container_width=True):
+                if st.button("", key=f"cat_btn_{i}", use_container_width=True):
                     st.session_state["selected_category"] = category["name"]
                     st.session_state["current_page"] = "category_view"
                     st.session_state["cat_page_number"] = 0 
@@ -603,9 +718,22 @@ def page_home(df, cf_recommender):
                 </div>
                 """, unsafe_allow_html=True)
 
+    st.markdown("""
+    <style>
+    .category-card-img {
+        border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px; transition: all 0.3s ease; position: relative;
+    }
+    .category-card-img:hover { box-shadow: 0 1px 10px rgba(255, 255, 255, 0.8); transform: translateY(-3px); }
+    .category-label { background: #385F8C; color: white; padding: 10px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+    .stButton > button { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; background: transparent !important; border: none !important; color: transparent !important; z-index: 100 !important; cursor: pointer !important; }
+    .stButton > button:hover { background: transparent !important; border: none !important; }
+    div[data-testid="column"] button { position: absolute !important; z-index: 2 !important; opacity: 0 !important; height: 500px !important; }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("---")
 
-    # Best Sellers & Featured (Logic Code 1, UI Code 2)
+    # 3. Best Sellers & Featured
     if cf_recommender:
         most_liked = cf_recommender.get_most_liked_products(top_n=5)
         if not most_liked.empty:
@@ -614,7 +742,6 @@ def page_home(df, cf_recommender):
     st.subheader("✨ Produk Unggulan Kami")
     display_df = df[df['ImageURL'].notna() & (df['ImageURL'] != '')].head(15)
     
-    # Gunakan Loop Grid dari Code 1 tapi panggil render_product_card dari Code 2
     cols = st.columns(5)
     for idx, (index, row) in enumerate(display_df.iterrows()):
         with cols[idx % 5]:
@@ -625,7 +752,7 @@ def page_home(df, cf_recommender):
         if not recom_prods.empty:
             display_grid(recom_prods, "❤️ Rekomendasi Untuk Anda", full_df=df, prefix="recom")
 
-    # Footer Code 1
+    # Footer
     render_footer()
 
 # --- Main Controller ---
